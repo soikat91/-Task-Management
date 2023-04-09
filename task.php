@@ -38,8 +38,7 @@ include_once "./conntectdb.php";
         
         
 
-      }else
-       if("c"==$action){
+      }else if("c"==$action){
 
          $taskid=$_POST['taskid'];
        //  echo $taskid;
@@ -50,7 +49,61 @@ include_once "./conntectdb.php";
         
         }
         header("Location:index.php");
-        mysqli_close($connect);
+       
+     
+      } else if("incomplete"==$action){
+      
+       $taskid=$_POST['taskid'];
+      //  echo $taskid;
+       if($taskid){
+        $query="update task set complete=0 where id=$taskid limit 1";
+        mysqli_query($connect,$query);      
+       
+       }
+      header("Location:index.php");
+      
+    
+     }else if ("delete"==$action){
+        
+         $taskid=$_POST['taskid'];
+        // echo $taskid;
+         
+         if($taskid){
+           $query="delete from task where id=$taskid limit 1";
+           mysqli_query($connect,$query);
+         }
+         header("Location:index.php");
+
+
+     }else if ("bulkComplete"==$action){      
+        
+      $taskids=$_POST['taskids'];
+      // print_r($taskids);
+      $_taskids=join(",",$taskids);
+      
+      if($taskids){
+        $query="update task set complete=1 where id in ($_taskids)";
+      //  echo $query;
+      //  exit();
+       mysqli_query($connect,$query);
       }
-      //echo $action;
+      header("Location:index.php");
+
+
+      }else if ("bulkDelete"==$action){      
+            
+        $taskids=$_POST['taskids'];
+        // print_r($taskids);
+        $_taskids=join(",",$taskids);
+        
+        if($taskids){
+          $query="delete from task where id in ($_taskids)";
+        //  echo $query;
+        //  exit();
+        mysqli_query($connect,$query);
+        }
+        header("Location:index.php");
+
+
+    }
  }

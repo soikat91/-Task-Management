@@ -60,21 +60,17 @@
                         <td><?php echo $cdata['id']?></td>
                         <td><?php echo $cdata['task']?></td>
                         <td><?php echo $cdate?></td>
-                        <td><a href="index.php?<?php echo $cdata['id']?>">Delete</a></td>
+                        <td><a class="delete" data-taskid="<?php echo $cdata['id'] ?>" href="#">Delete</a> | <a class="inComplete" data-taskid="<?php echo $cdata['id'] ?>" href="#">Mark Complete</a> </td>
                     </tr>    
                <?php
                }
               ?>
                </tbody>
+              
             </table>
               <?php
               }
-            ?>
-            
-     
-        
-        
-           
+            ?>       
 
             <h4>Upcoming Tasks</h4>
             <?php
@@ -84,41 +80,54 @@
             <?php
                }else{
             ?>
-
+            <form action="task.php" method="post" >
             <table class="table">
-                <tbody>
-                    <tr>
-                        <th></th>
-                        <th>Id</th>
-                        <th>Task</th>
-                        <th>Date</th>
-                        <th>Action</th>
-                    </tr>
-                    <?php
-                    while($data=mysqli_fetch_assoc($result)){
+                
+                    <tbody>
+                        <tr>
+                            <th></th>
+                            <th>Id</th>
+                            <th>Task</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                        <?php
+                        while($data=mysqli_fetch_assoc($result)){
 
-                        $timeStmp=strtotime($data['date']);
-                        $date=date("jS M,Y",$timeStmp);
-                                      
-                    ?>
-                    <tr>
-                        <td><input type="checkbox" value="<?php echo $data['id']?>"></td>
-                        <td><?php echo $data['id']?></td>
-                        <td><?php echo $data['task']?></td>
-                        <td><?php echo $date?></td>
-                        <td><a href="#">Delete</a> | <a class="complete" data-taskid="<?php echo $data['id']?>" href="#">Complete</a></td>
-                    </tr>
-                    <?php
-                    }
-                    ?>
-                    
-                </tbody>
+                            $timeStmp=strtotime($data['date']);
+                            $date=date("jS M,Y",$timeStmp);
+                                        
+                        ?>
+                        <tr>
+                            <td><input name="taskids[]" type="checkbox" value="<?php echo $data['id']?>"></td>
+                            <td><?php echo $data['id']?></td>
+                            <td><?php echo $data['task']?></td>
+                            <td><?php echo $date?></td>
+                            <td><a class="delete" data-taskid="<?php echo $data['id'] ?>" href="#">Delete</a> | <a class="complete" data-taskid="<?php echo $data['id']?>" href="#">Complete</a></td>
+                        </tr>
+                        <?php
+                        }
+                        ?>
+                        
+                    </tbody>
+                
             </table>
+
+            <select class="form-select p-2" name="action" id="bulkAction">
+                    
+                    <option value="" selected>Selet One</option>
+                    <option value="bulkComplete">Mark Complete</option>
+                    <option value="bulkDelete">Delete</option>
+                   
+           </select>
+           <button type="submit" class="btn" id="bulkSubmit">Submit</button>
+        </form>  
             <?php
             } 
             
             ?>
-        <h2>Add Tasks</h2>
+          
+        <h2 class="mt-3">Add Tasks</h2>
         <?php
             $msg=$_GET['added']?? '';
 
@@ -141,8 +150,18 @@
         </div>
 
         <form action="task.php" method="post" id="completeForm">
-        <input type="hidden" class="form-control" name="action" value="c">
+            <input type="hidden" class="form-control" name="action" value="c">
             <input type="hidden" id="taskid" name="taskid">
+        </form>
+
+        <form action="task.php" method="post" id="inCompleteForm">
+            <input type="hidden" class="form-control" name="action" value="incomplete">
+            <input type="hidden" id="itaskid" name="taskid">
+        </form>
+
+        <form action="task.php" method="post" id="deleteForm">
+            <input type="hidden" class="form-control" name="action" value="delete">
+            <input type="hidden" id="dtaskid" name="taskid">
         </form>
         <div class="col-lg-3">
             
@@ -162,6 +181,30 @@
             $("#taskid").val(id);
             $("#completeForm").submit();
         });
+
+        $(".inComplete").on('click',function(){
+            var id=$(this).data('taskid');
+           // alert(id);
+            $("#itaskid").val(id);
+            $("#inCompleteForm").submit();
+        })
+
+        $(".delete").on("click",function(){
+            if(confirm("Are you sure Delete this?")){
+                var id=$(this).data("taskid");
+                //alert(id);
+                $("#dtaskid").val(id);
+                $("#deleteForm").submit();
+            }
+            
+        })
+        $("#bulkSubmit").on("click",function(){
+            if($("#bulkAction").val()=="bulkDelete"){
+                if(!confirm("Are You Sure ?")){
+                    return false;
+                }
+            }
+        })
      });
     })(jQuery);
     </script>
